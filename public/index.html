@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookShare MVP</title>
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="scripts/index.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">BookShare</div>
+
+        <div class="nav-links">
+            <input type="text" id="globalSearch" placeholder="Search books...">
+            <button onclick="goToAddPage()">Add Book</button>
+            <button>Lists</button>
+            <button>Profile</button>
+            <button>Login</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <form id="bookForm">
+                <input type="text" id="title" placeholder="Title" required>
+                <input type="text" id="author" placeholder="Author" required>
+
+                <select id="status">
+                    <option value="reading">Reading</option>
+                    <option value="read">Read</option>
+                    <option value="want_to_read">Want to Read</option>
+                </select>
+
+                <select id="rating">
+                    <option value="">Rating</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        
+        <div class="book-grid" id="bookGrid"></div>
+
+    </div>
+
+</body>
+
+</html>

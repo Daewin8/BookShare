@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details</title>
+    <link rel="stylesheet" href="styles/books.css">
+    <script src="scripts/books.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">BookShare</div>
+
+        <div class="nav-links">
+            <input type="text" id="globalSearch" placeholder="Search books...">
+            <button>All Books</button>
+            <button>Lists</button>
+            <button>Profile</button>
+            <button>Login</button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div id="bookListPage">
+            <h2>Books</h2>
+            <div class="grid" id="bookGrid"></div>
+        </div>
+
+        <div id="bookDetailPage" class="hidden">
+            <button onclick="goBack()">← Back</button>
+            <div class="book-detail" id="bookDetail"></div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

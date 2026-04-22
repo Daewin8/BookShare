@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Book</title>
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="scripts/add.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">BookShare</div>
+        <button onclick="goBack()">← Back</button>
+    </header>
+
+    <div class="container">
+
+        <h2>Add a New Book</h2>
+
+        <form id="addBookForm" class="form-container">
+
+            <input type="text" id="title" placeholder="Title" required>
+
+            <textarea id="description" placeholder="Description"></textarea>
+
+            <input type="number" id="author_id" placeholder="Author ID">
+
+            <button type="submit">Add Book</button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>
