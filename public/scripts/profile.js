@@ -1,68 +1,131 @@
-let books = [
-    { title: "The Hobbit", status: "Completed" },
-    { title: "1984", status: "Want to Read" },
-    { title: "One Piece", status: "Completed" },
-    { title: "Attack on Titan", status: "Reading" }
-];
+let currentUser = JSON.parse(localStorage.getItem("user")) || null;
 
-let lists = [
-    { name: "Favorites", user: "Jay", books: [books[0], books[2]] }
-];
+if (!currentUser) {
+    window.location.href = "login.html";
+}
 
-let reviews = [
-    "Great book!",
-    "Loved the story"
-];
+function goHome() {
+    window.location.href = "index.html";
+}
 
-function showPage(id) {
-    ['booksPage', 'listsPage', 'profilePage'].forEach(p => document.getElementById(p).classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
+function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
 }
 
 function showTab(tabId, btn) {
-    ['profileTab', 'booksTab', 'wantTab', 'reviewsTab', 'listsTab'].forEach(t => document.getElementById(t).classList.add('hidden'));
-    document.getElementById(tabId).classList.remove('hidden');
+    const tabs = ["readingTab", "readTab", "wantTab"];
 
-    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    tabs.forEach(id => {
+        const tab = document.getElementById(id);
+        if (tab) {
+            tab.classList.add("hidden");
+        }
+    });
+
+    const selectedTab = document.getElementById(tabId);
+    if (selectedTab) {
+        selectedTab.classList.remove("hidden");
+    }
+
+    document.querySelectorAll(".tabs button").forEach(button => {
+        button.classList.remove("active");
+    });
+
+    btn.classList.add("active");
 }
 
-function renderProfile() {
-    const readBooks = books.filter(b => b.status === 'Completed');
-    const wantBooks = books.filter(b => b.status === 'Want to Read');
-
-    document.getElementById('booksReadCount').textContent = readBooks.length;
-
-    // favorites (first 4 for now)
-    const favGrid = document.getElementById('favoriteGrid');
-    favGrid.innerHTML = '';
-    books.slice(0, 4).forEach(b => {
-        favGrid.innerHTML += `<div class='card'>${b.title}</div>`;
-    });
-
-    const readGrid = document.getElementById('readGrid');
-    readGrid.innerHTML = '';
-    readBooks.forEach(b => {
-        readGrid.innerHTML += `<div class='card'>${b.title}</div>`;
-    });
-
-    const wantGrid = document.getElementById('wantGrid');
-    wantGrid.innerHTML = '';
-    wantBooks.forEach(b => {
-        wantGrid.innerHTML += `<div class='card'>${b.title}</div>`;
-    });
-
-    const reviewsDiv = document.getElementById('reviewsContainer');
-    reviewsDiv.innerHTML = '';
-    reviews.forEach(r => {
-        reviewsDiv.innerHTML += `<div class='card'>${r}</div>`;
-    });
-
-    const userLists = document.getElementById('userListsGrid');
-    userLists.innerHTML = '';
-    lists.forEach(l => {
-        userLists.innerHTML += `<div class='card'>${l.name}</div>`;
-    });
+function createEmptyCard(message) {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.textContent = message;
+    return card;
 }
 
-renderProfile();
+function createBookCard(book) {
+    const card = document.createElement("div");
+    card.classList.add("card");
+
+    const title = document.createElement("div");
+    title.classList.add("card-title");
+    title.textContent = book.title || "Untitled Book";
+
+    const author = document.createElement("div");
+    author.classList.add("book-meta");
+    author.textContent = book.author || book.author_name || "Unknown Author";
+
+    const status = document.createElement("div");
+    status.classList.add("book-meta");
+    status.textContent = "Status: " + (book.status || "none");
+
+    card.appendChild(title);
+    card.appendChild(author);
+    card.appendChild(status);
+
+    card.addEventListener("click", () => {
+        window.location.href = `books.html?id=${book.id}`;
+    });
+
+    return card;
+}
+
+async function loadUserBooks(status, gridId) {
+    const grid = document.getElementById(gridId);
+
+    if (!grid) {
+        console.error("Grid not found:", gridId);
+        return 0;
+    }
+
+    grid.textContent = "";
+
+    try {
+        const res = await fetch(
+            `/api/books/user-status/status/${currentUser.id}/${status}`
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.error(`Failed to load ${status}:`, data);
+            grid.appendChild(createEmptyCard("Could not load books."));
+            return 0;
+        }
+
+        const books = Array.isArray(data) ? data : [];
+
+        if (books.length === 0) {
+            grid.appendChild(createEmptyCard("No books here yet."));
+            return 0;
+        }
+
+        books.forEach(book => {
+            grid.appendChild(createBookCard(book));
+        });
+
+        return books.length;
+
+    } catch (err) {
+        console.error(`Profile load error for ${status}:`, err);
+        grid.appendChild(createEmptyCard("Error loading books."));
+        return 0;
+    }
+}
+
+async function loadProfile() {
+    document.getElementById("username").textContent = currentUser.username;
+
+    const readingCount = await loadUserBooks("reading", "readingGrid");
+    const readCount = await loadUserBooks("read", "readGrid");
+    const wantCount = await loadUserBooks("want_to_read", "wantGrid");
+
+    document.getElementById("booksReadingCount").textContent = readingCount;
+    document.getElementById("booksReadCount").textContent = readCount;
+    document.getElementById("booksWantCount").textContent = wantCount;
+}
+
+window.goHome = goHome;
+window.logout = logout;
+window.showTab = showTab;
+
+loadProfile();

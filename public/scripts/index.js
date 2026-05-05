@@ -1,118 +1,178 @@
-const form = document.getElementById('bookForm');
-const grid = document.getElementById('bookGrid');
+let currentUser = JSON.parse(localStorage.getItem("user")) || null;
+
+const grid = document.getElementById("bookGrid");
 const searchBar = document.getElementById("globalSearch");
 
 let allBooks = [];
 
 const API_URL = "/api/books";
 
+function updateNavbar() {
+    const loginBtn = document.getElementById("loginBtn");
+    const profileBtn = document.getElementById("profileBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (!loginBtn || !profileBtn || !logoutBtn) return;
+
+    if (currentUser) {
+        loginBtn.style.display = "none";
+        profileBtn.style.display = "inline-block";
+        logoutBtn.style.display = "inline-block";
+    } else {
+        loginBtn.style.display = "inline-block";
+        profileBtn.style.display = "none";
+        logoutBtn.style.display = "none";
+    }
+}
+
+function logout() {
+    localStorage.removeItem("user");
+    currentUser = null;
+    updateNavbar();
+    window.location.href = "index.html";
+}
+
+async function getBookStatus(bookId) {
+    if (!currentUser) return null;
+
+    try {
+        const res = await fetch(
+            `/api/books/user-status/book/${currentUser.id}/${bookId}`
+        );
+
+        if (!res.ok) {
+            console.error("Failed to get book status:", await res.text());
+            return null;
+        }
+
+        const data = await res.json();
+        return data?.status || null;
+
+    } catch (err) {
+        console.error("Error getting book status:", err);
+        return null;
+    }
+}
+
+async function setStatus(bookId, status) {
+    if (!currentUser) {
+        alert("Login required");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const existing = await getBookStatus(bookId);
+
+        if (existing === status) {
+            await fetch("/api/books/user-status", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    book_id: bookId
+                })
+            });
+
+            await loadBooks();
+            return;
+        }
+
+        // Otherwise set/update status
+        await fetch("/api/books/user-status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                book_id: bookId,
+                status
+            })
+        });
+
+        await loadBooks();
+
+    } catch (err) {
+        console.error("Error setting status:", err);
+    }
+}
+
 async function loadBooks() {
     try {
         const res = await fetch(API_URL);
-        const data = await res.json();
 
-        allBooks = data;
-        renderBooks(allBooks);
+        if (!res.ok) {
+            console.error("Failed to load books:", await res.text());
+            return;
+        }
+
+        const data = await res.json();
+        allBooks = Array.isArray(data) ? data : [];
+
+        await renderBooks(allBooks);
 
     } catch (err) {
         console.error("Error loading books:", err);
     }
 }
 
-form.addEventListener('submit', async function (e) {
-  e.preventDefault();
+async function renderBooks(books) {
+    grid.textContent = "";
 
-  const book = {
-    title: document.getElementById('title').value,
-    description: "",
-    author_id: null 
-  };
+    for (const book of books) {
+        const card = document.createElement("div");
+        card.classList.add("book-card");
 
-  try {
-    await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(book)
-    });
+        const title = document.createElement("div");
+        title.classList.add("book-title");
+        title.textContent = book.title || "Untitled Book";
+        title.style.cursor = "pointer";
+        title.addEventListener("click", () => openBookPage(book.id));
 
-    form.reset();
-    loadBooks();
+        const author = document.createElement("div");
+        author.classList.add("book-meta");
+        author.textContent = book.author || book.author_name || "Unknown Author";
 
-  } catch (err) {
-    console.error("Error adding book:", err);
-  }
-});
+        const statusText = document.createElement("div");
+        statusText.classList.add("book-meta");
 
-function renderBooks(books) {
-    grid.innerHTML = '';
+        const currentStatus = await getBookStatus(book.id);
 
-    books.forEach(book => {
-        const card = document.createElement('div');
-        card.classList.add('book-card');
+        if (currentUser) {
+            statusText.textContent = "Status: " + (currentStatus || "none");
+        } else {
+            statusText.textContent = "Login to track this book";
+        }
 
-        card.innerHTML = `
-            <div class="book-title" onclick="openBookPage(${book.id})" style="cursor:pointer;">
-                ${book.title}
-            </div>
+        const actions = document.createElement("div");
+        actions.classList.add("actions");
 
-            <div class="book-meta">${book.author || "Unknown Author"}</div>
-            <div class="book-meta">${book.description || "No Description Available"}</div>
+        const statuses = [
+            { label: "Read", value: "read" },
+            { label: "Reading", value: "reading" },
+            { label: "Want", value: "want_to_read" }
+        ];
 
-            <div class="actions">
-                <button onclick="markAsRead(${book.id})">Read</button>
-                <button onclick="addToList(${book.id}, 'reading')">Reading</button>
-                <button onclick="addToList(${book.id}, 'want_to_read')">Want</button>
-            </div>
-        `;
+        statuses.forEach(item => {
+            const btn = document.createElement("button");
+            btn.textContent = item.label;
 
-        grid.appendChild(card);
-    });
-}
+            if (currentStatus === item.value) {
+                btn.classList.add("active-status");
+            }
 
-function openBookPage(id) {
-    window.location.href = "books.html?id=" + id;
-}
+            btn.addEventListener("click", () => {
+                setStatus(book.id, item.value);
+            });
 
-function goToAddPage() {
-    window.location.href = "add.html";
-}
-
-function markAsRead(bookId) {
-    fetch("/api/books/user-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            user_id: 1,
-            book_id: bookId,
-            status: "read"
-        })
-    })
-    .then(() => {
-        alert("Marked as read!");
-    })
-    .catch(err => console.error(err));
-}
-
-async function addToList(bookId, status) {
-    try {
-        await fetch("/api/books/user-status", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                user_id: 1,
-                book_id: bookId,
-                status: status
-            })
+            actions.appendChild(btn);
         });
 
-        alert("Added to " + status);
+        card.appendChild(title);
+        card.appendChild(author);
+        card.appendChild(statusText);
+        card.appendChild(actions);
 
-    } catch (err) {
-        console.error("Error updating status:", err);
+        grid.appendChild(card);
     }
 }
 
@@ -124,15 +184,41 @@ searchBar.addEventListener("input", (e) => {
         return;
     }
 
-    const filtered = allBooks.filter(book => {
-        return (
-            book.title?.toLowerCase().includes(query) ||
-            book.author?.toLowerCase().includes(query) ||
-            book.description?.toLowerCase().includes(query)
-        );
-    });
+    const filtered = allBooks.filter(book =>
+        book.title?.toLowerCase().includes(query) ||
+        book.author?.toLowerCase().includes(query) ||
+        book.author_name?.toLowerCase().includes(query) ||
+        book.description?.toLowerCase().includes(query)
+    );
 
     renderBooks(filtered);
 });
 
+function openBookPage(id) {
+    window.location.href = "books.html?id=" + id;
+}
+
+function goToLogin() {
+    window.location.href = "login.html";
+}
+
+function goToProfile() {
+    window.location.href = "profile.html";
+}
+
+function goToAddPage() {
+    window.location.href = "add.html";
+}
+
+function goToHome() {
+    window.location.href = "index.html";
+}
+
+window.logout = logout;
+window.goToLogin = goToLogin;
+window.goToProfile = goToProfile;
+window.goToAddPage = goToAddPage;
+window.goToHome = goToHome;
+
+updateNavbar();
 loadBooks();

@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Book</title>
-    <link rel="stylesheet" href="styles/index.css">
+    <link rel="stylesheet" href="styles/add.css">
     <script src="scripts/add.js" defer></script>
 </head>
 
 <body>
 
     <header>
-        <div class="logo">BookShare</div>
+        <div class="logo" onclick="goHome()" style="cursor:pointer;">BookShare</div>
         <button onclick="goBack()">← Back</button>
     </header>
 
@@ -20,16 +20,23 @@
         <h2>Add a New Book</h2>
 
         <form id="addBookForm" class="form-container">
-
             <input type="text" id="title" placeholder="Title" required>
 
             <textarea id="description" placeholder="Description"></textarea>
 
-            <input type="number" id="author_id" placeholder="Author ID">
+            <input type="text" id="author_name" placeholder="Author Name">
 
             <button type="submit">Add Book</button>
-
         </form>
+
+        <div class="form-container">
+            <h3>Search Google Books</h3>
+
+            <input type="text" id="googleSearch" placeholder="Search Google Books...">
+            <button type="button" onclick="searchGoogleBooks()">Search</button>
+
+            <div id="results"></div>
+        </div>
 
     </div>
 

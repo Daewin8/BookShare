@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookShare MVP</title>
+    <title>Profile - BookShare</title>
     <link rel="stylesheet" href="styles/profile.css">
     <script src="scripts/profile.js" defer></script>
 </head>
@@ -12,65 +12,41 @@
 <body>
 
     <header>
-        <div class="logo">BookShare</div>
+        <div class="logo" onclick="goHome()" style="cursor:pointer;">BookShare</div>
+
         <div class="nav-links">
-            <button onclick="showPage('booksPage')">Books</button>
-            <button onclick="showPage('listsPage')">Lists</button>
-            <button onclick="showPage('profilePage')">Profile</button>
+            <button onclick="logout()">Logout</button>
         </div>
     </header>
 
     <div class="container">
 
-        <div id="booksPage">
-            <div class="grid" id="bookGrid"></div>
+        <div class="profile-header">
+            <h2 id="username">User</h2>
+            <p>Books Read: <span id="booksReadCount">0</span></p>
+            <p>Currently Reading: <span id="booksReadingCount">0</span></p>
+            <p>Want to Read: <span id="booksWantCount">0</span></p>
         </div>
 
-        <div id="listsPage" class="hidden">
-            <h2>Lists</h2>
-            <div class="grid" id="listsGrid"></div>
+        <div class="tabs">
+            <button class="active" onclick="showTab('readingTab', this)">Reading</button>
+            <button onclick="showTab('readTab', this)">Read</button>
+            <button onclick="showTab('wantTab', this)">Want to Read</button>
         </div>
 
-        <div id="profilePage" class="hidden">
+        <div id="readingTab">
+            <h3>Currently Reading</h3>
+            <div class="grid" id="readingGrid"></div>
+        </div>
 
-            <div class="profile-header">
-                <h2 id="username">Jay</h2>
-                <p>Books Read: <span id="booksReadCount"></span></p>
-            </div>
+        <div id="readTab" class="hidden">
+            <h3>Read Books</h3>
+            <div class="grid" id="readGrid"></div>
+        </div>
 
-            <div class="tabs">
-                <button class="active" onclick="showTab('profileTab', this)">Profile</button>
-                <button onclick="showTab('booksTab', this)">Books</button>
-                <button onclick="showTab('wantTab', this)">Want to Read</button>
-                <button onclick="showTab('reviewsTab', this)">Reviews</button>
-                <button onclick="showTab('listsTab', this)">Lists</button>
-            </div>
-
-            <div id="profileTab">
-                <h3>Favorite Books</h3>
-                <div class="grid" id="favoriteGrid"></div>
-            </div>
-
-            <div id="booksTab" class="hidden">
-                <h3>Books Read</h3>
-                <div class="grid" id="readGrid"></div>
-            </div>
-
-            <div id="wantTab" class="hidden">
-                <h3>Want to Read</h3>
-                <div class="grid" id="wantGrid"></div>
-            </div>
-
-            <div id="reviewsTab" class="hidden">
-                <h3>Reviews</h3>
-                <div id="reviewsContainer"></div>
-            </div>
-
-            <div id="listsTab" class="hidden">
-                <h3>Your Lists</h3>
-                <div class="grid" id="userListsGrid"></div>
-            </div>
-
+        <div id="wantTab" class="hidden">
+            <h3>Want to Read</h3>
+            <div class="grid" id="wantGrid"></div>
         </div>
 
     </div>

@@ -12,25 +12,18 @@
 <body>
 
     <header>
-        <div class="logo">BookShare</div>
+        <div class="logo" onclick="goHome()" style="cursor:pointer;">BookShare</div>
 
         <div class="nav-links">
-            <input type="text" id="globalSearch" placeholder="Search books...">
-            <button>All Books</button>
-            <button>Lists</button>
-            <button>Profile</button>
-            <button>Login</button>
+            <button id="loginBtn" onclick="goToLogin()">Login</button>
+            <button id="profileBtn" onclick="goToProfile()" style="display:none;">Profile</button>
+            <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
         </div>
     </header>
 
     <div class="container">
 
-        <div id="bookListPage">
-            <h2>Books</h2>
-            <div class="grid" id="bookGrid"></div>
-        </div>
-
-        <div id="bookDetailPage" class="hidden">
+        <div id="bookDetailPage">
             <button onclick="goBack()">← Back</button>
             <div class="book-detail" id="bookDetail"></div>
         </div>

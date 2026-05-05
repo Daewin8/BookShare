@@ -88,3 +88,18 @@
          grid-template-columns: 1fr;
      }
  }
+
+ .card {
+    cursor: pointer;
+}
+
+.card-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.book-meta {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 5px;
+}

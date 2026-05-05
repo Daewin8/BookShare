@@ -37,47 +37,7 @@ header {
     cursor: pointer;
 }
 
-.container {
-    padding: 20px;
-}
-
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-}
-
-.book-card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.book-title {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.book-meta {
-    font-size: 0.9rem;
-    color: #555;
-    margin-top: 5px;
-}
-
-.actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 5px;
-}
-
-.actions button {
-    flex: 1;
-    padding: 5px;
-    font-size: 0.8rem;
-    cursor: pointer;
-}
-
+/* ADD BOOK FORM */
 .form-container {
     margin-bottom: 20px;
     background: white;
@@ -119,21 +79,29 @@ form button {
     }
 }
 
-.actions button.active-status {
-    background-color: #4CAF50;
+.google-book-card {
+    background: white;
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.google-book-card h4 {
+    margin: 0 0 5px 0;
+}
+
+.google-book-card p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.google-book-card button {
+    margin-top: 8px;
+    background: #222;
     color: white;
-    font-weight: bold;
-}
-
-#toggleBtn {
     border: none;
-    background: none;
-    color: blue;
+    padding: 7px 10px;
+    border-radius: 5px;
     cursor: pointer;
-    padding: 0;
-    font-size: 1rem;
-}
-
-#toggleBtn:hover {
-    text-decoration: underline;
 }

@@ -2,76 +2,98 @@ const db = require("./db");
 
 exports.getAllBooks = async () => {
     const result = await db.query(`
-        SELECT 
-            books.id,
-            books.title,
-            books.description,
-            books.author_id,
-            authors.name AS author
+        SELECT id, title, description, author_name AS author
         FROM books
-        LEFT JOIN authors ON books.author_id = authors.id
     `);
 
     return result.rows;
 };
 
 exports.getBookById = async (id) => {
-  const result = await db.query(`
-        SELECT 
-            books.id,
-            books.title,
-            books.description,
-            authors.name AS author,
-            authors.biography AS author_bio
-        FROM books
-        LEFT JOIN authors ON books.author_id = authors.id
-        WHERE books.id = $1
-    `, [id]);
-
-  return result.rows[0];
-};
-
-exports.addBook = async (book) => {
-    const {
-        title,
-        description,
-        author_id
-    } = book;
-
     const result = await db.query(`
-        INSERT INTO books (title, description, author_id)
-        VALUES ($1, $2, $3)
-        RETURNING *
-    `, [
-        title,
-        description,
-        author_id
-    ]);
+        SELECT id, title, description, author_name AS author
+        FROM books
+        WHERE id = $1
+    `, [id]);
 
     return result.rows[0];
 };
 
-exports.addUserBookStatus = async (user_id, book_id, status) => {
-  const result = await db.query(
-    `INSERT INTO user_books (user_id, book_id, status)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (user_id, book_id)
-         DO UPDATE SET status = EXCLUDED.status
-         RETURNING *`,
-    [user_id, book_id, status]
-  );
+exports.setUserBookStatus = async (user_id, book_id, status) => {
+    const result = await db.query(`
+        INSERT INTO user_books (user_id, book_id, status)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (user_id, book_id)
+        DO UPDATE SET status = EXCLUDED.status
+        RETURNING *
+    `, [user_id, book_id, status]);
 
-  return result.rows[0];
+    return result.rows[0];
 };
 
 exports.getUserBooksByStatus = async (user_id, status) => {
-  const result = await db.query(
-    `SELECT books.*, user_books.status
-         FROM books
-         JOIN user_books ON books.id = user_books.book_id
-         WHERE user_books.user_id = $1 AND user_books.status = $2`,
-    [user_id, status]
-  );
+    const result = await db.query(`
+        SELECT 
+            b.id,
+            b.title,
+            b.description,
+            b.author_name AS author,
+            ub.status
+        FROM user_books ub
+        INNER JOIN books b ON b.id = ub.book_id
+        WHERE ub.user_id = $1 
+        AND ub.status = $2
+        ORDER BY ub.created_at DESC
+    `, [user_id, status]);
 
-  return result.rows;
+    return result.rows || [];
+};
+
+exports.getUserBookStatus = async (user_id, book_id) => {
+    const result = await db.query(`
+        SELECT status
+        FROM user_books
+        WHERE user_id = $1 AND book_id = $2
+    `, [user_id, book_id]);
+
+    return result.rows[0];
+};
+
+exports.removeUserBookStatus = async (user_id, book_id) => {
+    const result = await db.query(`
+        DELETE FROM user_books
+        WHERE user_id = $1 AND book_id = $2
+        RETURNING *
+    `, [user_id, book_id]);
+
+    return result.rows[0];
+};
+
+exports.addFavorite = async (user_id, book_id) => {
+    const result = await db.query(`
+        INSERT INTO favorites (user_id, book_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+        RETURNING *
+    `, [user_id, book_id]);
+
+    return result.rows[0];
+};
+
+exports.removeFavorite = async (user_id, book_id) => {
+    await db.query(`
+        DELETE FROM favorites
+        WHERE user_id = $1 AND book_id = $2
+    `, [user_id, book_id]);
+};
+
+exports.getFavorites = async (user_id) => {
+    const result = await db.query(`
+        SELECT b.*
+        FROM books b
+        JOIN favorites f ON b.id = f.book_id
+        WHERE f.user_id = $1
+    `, [user_id]);
+
+    return result.rows;
 };

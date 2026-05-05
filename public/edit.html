@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Book</title>
+    <link rel="stylesheet" href="styles/books.css">
+    <script src="scripts/edit.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo" onclick="goHome()" style="cursor:pointer;">BookShare</div>
+    </header>
+
+    <div class="container">
+        <button onclick="goBack()">← Back</button>
+
+        <div class="book-detail">
+            <h2>Edit Book</h2>
+
+            <form id="editBookForm" class="edit-form">
+                <input type="text" id="title" placeholder="Title" required>
+
+                <input type="text" id="author_name" placeholder="Author Name">
+
+                <textarea id="description" placeholder="Description"></textarea>
+
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

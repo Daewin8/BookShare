@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Book</title>
+    <link rel="stylesheet" href="styles/books.css">
+    <script src="scripts/delete.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo" onclick="goHome()" style="cursor:pointer;">BookShare</div>
+    </header>
+
+    <div class="container">
+        <button onclick="goBack()">← Back</button>
+
+        <div class="book-detail">
+            <h2>Delete Book</h2>
+
+            <p id="deleteMessage">Loading book...</p>
+
+            <div class="status-buttons">
+                <button id="confirmDeleteBtn" class="delete-button">Yes, Delete This Book</button>
+                <button onclick="goBack()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
