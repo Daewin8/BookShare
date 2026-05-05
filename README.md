@@ -5,17 +5,15 @@ https://uncg-my.sharepoint.com/:v:/g/personal/dtwilliams_uncg_edu/IQCGcegiyMGQSq
 BooKShare is a full-stack web application that lets users browse, add, edit, delete, and track books. Users can create an account, log in, view a shared book library, add books to their personal reading shelves, and organize books by status: Reading, Read, or Want to Read.
 
 The app is designed for readers who want a simple way to keep track of books they have read or plan to read.
----
 
 Deployed App URL
 
 bookshare-production-c641.up.railway.app
 
----
 
 GitHub Repository
 
-PASTE YOUR GITHUB URL HERE
+https://github.com/Daewin8/BookShare
 
 Setup Instructions
 
